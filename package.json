@@ -1,0 +1,12 @@
+{
+  "name": "2048-game",
+  "version": "1.0.0",
+  "description": "2048 Game for Azure",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "dependencies": {
+    "express": "^4.19.2"
+  }
+}
