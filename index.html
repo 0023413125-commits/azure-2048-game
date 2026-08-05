@@ -17,83 +17,361 @@
   <meta name="viewport" content="width=device-width, target-densitydpi=160dpi, initial-scale=1.0, maximum-scale=1, user-scalable=no, minimal-ui">
 </head>
 <body>
-  <div class="container">
-    <div class="heading">
-      <h1 class="title">2048</h1>
-      <div class="scores-container">
-        <div class="score-container">0</div>
-        <div class="best-container">0</div>
-      </div>
+
+
+<div id="loginContainer" class="login-page">
+
+    <div class="login-card">
+
+        <h1>🎮 2048 Game</h1>
+
+        <p>Đăng nhập để lưu điểm và xem bảng xếp hạng</p>
+
+        <input
+            id="username"
+            type="text"
+            placeholder="Tên đăng nhập"
+        >
+
+        <input
+            id="password"
+            type="password"
+            placeholder="Mật khẩu"
+        >
+
+        <button class="login-btn" onclick="login()">
+            Đăng nhập
+        </button>
+
+        <button class="register-btn" onclick="register()">
+            Tạo tài khoản
+        </button>
+
+        <p id="msg"></p>
+
     </div>
 
-    <div class="above-game">
-      <p class="game-intro">Join the numbers and get to the <strong>2048 tile!</strong></p>
-      <a class="restart-button">New Game</a>
+</div>
+
+<div id="gameContainer" style="display:none">
+
+    <div class="main-layout">
+
+        <!-- Cột trái -->
+        <div class="left-panel">
+
+            <div class="user-box">
+
+                <img id="avatar"
+                src="https://ui-avatars.com/api/?name=User&background=edc22e&color=fff">
+
+                <h2 id="playerName"></h2>
+
+                <p>Điểm cao nhất</p>
+
+                <h3 id="bestScore">0</h3>
+
+                <button onclick="logout()">Đăng xuất</button>
+
+            </div>
+
+            <div class="leaderboard-box">
+
+                <h2>🏆 Bảng xếp hạng</h2>
+
+                <table id="leaderboard">
+
+                    <thead>
+                        <tr>
+                            <th>#</th>
+                            <th>Tên</th>
+                            <th>Điểm</th>
+                        </tr>
+                    </thead>
+
+                    <tbody></tbody>
+
+                </table>
+
+            </div>
+
+        </div>
+
+        <!-- Cột phải -->
+        <div class="right-panel">
+
+            <div class="container">
+
+                <div class="heading">
+
+                    <h1 class="title">2048</h1>
+
+                    <div class="scores-container">
+
+                        <div class="score-container">0</div>
+
+                        <div class="best-container">0</div>
+
+                    </div>
+
+                </div>
+
+                <div class="above-game">
+
+                    <p class="game-intro">
+                        Join the numbers and get to the <strong>2048 tile!</strong>
+                    </p>
+
+                    <a class="restart-button">New Game</a>
+
+                </div>
+
+                <div class="game-container">
+
+                    <div class="game-message">
+
+                        <p></p>
+
+                        <div class="lower">
+
+                            <a class="keep-playing-button">Keep going</a>
+
+                            <a class="retry-button">Try again</a>
+
+                        </div>
+
+                    </div>
+
+                    <div class="grid-container">
+
+                        <div class="grid-row">
+                            <div class="grid-cell"></div>
+                            <div class="grid-cell"></div>
+                            <div class="grid-cell"></div>
+                            <div class="grid-cell"></div>
+                        </div>
+
+                        <div class="grid-row">
+                            <div class="grid-cell"></div>
+                            <div class="grid-cell"></div>
+                            <div class="grid-cell"></div>
+                            <div class="grid-cell"></div>
+                        </div>
+
+                        <div class="grid-row">
+                            <div class="grid-cell"></div>
+                            <div class="grid-cell"></div>
+                            <div class="grid-cell"></div>
+                            <div class="grid-cell"></div>
+                        </div>
+
+                        <div class="grid-row">
+                            <div class="grid-cell"></div>
+                            <div class="grid-cell"></div>
+                            <div class="grid-cell"></div>
+                            <div class="grid-cell"></div>
+                        </div>
+
+                    </div>
+
+                    <div class="tile-container"></div>
+
+                </div>
+
+            </div>
+
+        </div>
+
     </div>
 
-    <div class="game-container">
-      <div class="game-message">
-        <p></p>
-        <div class="lower">
-	        <a class="keep-playing-button">Keep going</a>
-          <a class="retry-button">Try again</a>
-        </div>
-      </div>
-
-      <div class="grid-container">
-        <div class="grid-row">
-          <div class="grid-cell"></div>
-          <div class="grid-cell"></div>
-          <div class="grid-cell"></div>
-          <div class="grid-cell"></div>
-        </div>
-        <div class="grid-row">
-          <div class="grid-cell"></div>
-          <div class="grid-cell"></div>
-          <div class="grid-cell"></div>
-          <div class="grid-cell"></div>
-        </div>
-        <div class="grid-row">
-          <div class="grid-cell"></div>
-          <div class="grid-cell"></div>
-          <div class="grid-cell"></div>
-          <div class="grid-cell"></div>
-        </div>
-        <div class="grid-row">
-          <div class="grid-cell"></div>
-          <div class="grid-cell"></div>
-          <div class="grid-cell"></div>
-          <div class="grid-cell"></div>
-        </div>
-      </div>
-
-      <div class="tile-container">
-
-      </div>
-    </div>
-
-    <p class="game-explanation">
-      <strong class="important">How to play:</strong> Use your <strong>arrow keys</strong> to move the tiles. When two tiles with the same number touch, they <strong>merge into one!</strong>
-    </p>
-    <hr>
-    <p>
-    <strong class="important">Note:</strong> This site is the official version of 2048. You can play it on your phone via <a href="http://git.io/2048">http://git.io/2048.</a> All other apps or sites are derivatives or fakes, and should be used with caution.
-    </p>
-    <hr>
-    <p>
-    Created by <a href="http://gabrielecirulli.com" target="_blank">Gabriele Cirulli.</a> Based on <a href="https://itunes.apple.com/us/app/1024!/id823499224" target="_blank">1024 by Veewo Studio</a> and conceptually similar to <a href="http://asherv.com/threes/" target="_blank">Threes by Asher Vollmer.</a>
-    </p>
-  </div>
-
+</div>
   <script src="js/bind_polyfill.js"></script>
-  <script src="js/classlist_polyfill.js"></script>
-  <script src="js/animframe_polyfill.js"></script>
-  <script src="js/keyboard_input_manager.js"></script>
-  <script src="js/html_actuator.js"></script>
-  <script src="js/grid.js"></script>
-  <script src="js/tile.js"></script>
-  <script src="js/local_storage_manager.js"></script>
-  <script src="js/game_manager.js"></script>
-  <script src="js/application.js"></script>
+<script src="js/classlist_polyfill.js"></script>
+<script src="js/animframe_polyfill.js"></script>
+<script src="js/keyboard_input_manager.js"></script>
+<script src="js/html_actuator.js"></script>
+<script src="js/grid.js"></script>
+<script src="js/tile.js"></script>
+<script src="js/local_storage_manager.js"></script>
+<script src="js/game_manager.js"></script>
+<script src="js/application.js"></script>
+
+<script>
+
+window.currentUser
+
+// =======================
+// Đăng ký
+// =======================
+async function register(){
+
+    const username = document.getElementById("username").value.trim();
+    const password = document.getElementById("password").value.trim();
+
+    if(username === "" || password === ""){
+        document.getElementById("msg").innerText = "Vui lòng nhập đầy đủ thông tin.";
+        return;
+    }
+
+    const res = await fetch("/register",{
+        method:"POST",
+        headers:{
+            "Content-Type":"application/json"
+        },
+        body:JSON.stringify({
+            username,
+            password
+        })
+    });
+
+    const data = await res.json();
+
+    document.getElementById("msg").innerText = data.message;
+
+}
+
+// =======================
+// Đăng nhập
+// =======================
+async function login(){
+
+    const username = document.getElementById("username").value.trim();
+    const password = document.getElementById("password").value.trim();
+
+    if(username === "" || password === ""){
+        document.getElementById("msg").innerText = "Vui lòng nhập đầy đủ thông tin.";
+        return;
+    }
+
+    try{
+
+        const res = await fetch("/login",{
+
+            method:"POST",
+
+            headers:{
+                "Content-Type":"application/json"
+            },
+
+            body:JSON.stringify({
+
+                username,
+                password
+
+            })
+
+        });
+
+        const data = await res.json();
+
+        if(data.success){
+window.currentUser = username;
+localStorage.removeItem("bestScore");
+
+            // Hiển thị tên người chơi
+            document.getElementById("playerName").innerText = username;
+
+            // Hiển thị điểm cao nhất
+            document.getElementById("bestScore").innerText = data.user.HighScore;
+
+            // Avatar theo tên
+            document.getElementById("avatar").src =
+            "https://ui-avatars.com/api/?name="
+            + encodeURIComponent(username)
+            + "&background=edc22e&color=fff";
+
+            // Ẩn login
+            document.getElementById("loginContainer").style.display="none";
+
+            // Hiện game
+            document.getElementById("gameContainer").style.display="block";
+
+            // Load bảng xếp hạng
+loadLeaderboard();
+
+requestAnimationFrame(function () {
+
+    new GameManager(
+        4,
+        KeyboardInputManager,
+        HTMLActuator,
+        LocalStorageManager
+    );
+
+});
+
+        }else{
+
+            document.getElementById("msg").innerText = data.message;
+
+        }
+
+    }catch(err){
+
+        document.getElementById("msg").innerText="Không thể kết nối server.";
+
+    }
+
+}
+
+// =======================
+// Load bảng xếp hạng (Top 3)
+// =======================
+async function loadLeaderboard() {
+
+    const res = await fetch("/leaderboard");
+    const data = await res.json();
+
+    const tbody = document.querySelector("#leaderboard tbody");
+    tbody.innerHTML = "";
+
+    // Chỉ lấy 3 người đầu
+    data.slice(0, 3).forEach((player, index) => {
+
+        let medal = "";
+
+        switch (index) {
+            case 0:
+                medal = "🥇";
+                break;
+            case 1:
+                medal = "🥈";
+                break;
+            case 2:
+                medal = "🥉";
+                break;
+        }
+
+        tbody.innerHTML += `
+            <tr>
+                <td>${medal}</td>
+                <td>${player.Username}</td>
+                <td>${player.HighScore}</td>
+            </tr>
+        `;
+    });
+
+}
+
+// =======================
+// Đăng xuất
+// =======================
+function logout(){
+
+    window.currentUser = "";
+
+    window.gameStarted = false;
+
+    localStorage.removeItem("gameState");
+
+    document.getElementById("loginContainer").style.display="flex";
+    document.getElementById("gameContainer").style.display="none";
+
+    document.getElementById("username").value="";
+    document.getElementById("password").value="";
+    document.getElementById("msg").innerText="";
+}
+</script>
+
 </body>
 </html>

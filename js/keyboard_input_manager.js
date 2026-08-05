@@ -50,24 +50,30 @@ KeyboardInputManager.prototype.listen = function () {
   };
 
   // Respond to direction keys
-  document.addEventListener("keydown", function (event) {
-    var modifiers = event.altKey || event.ctrlKey || event.metaKey ||
-                    event.shiftKey;
-    var mapped    = map[event.which];
+ document.addEventListener("keydown", function (event) {
 
-    if (!modifiers) {
-      if (mapped !== undefined) {
-        event.preventDefault();
-        self.emit("move", mapped);
-      }
+  if (
+    event.target.tagName === "INPUT" ||
+    event.target.tagName === "TEXTAREA"
+  ) {
+    return;
+  }
+
+  var modifiers = event.altKey || event.ctrlKey || event.metaKey ||
+                  event.shiftKey;
+  var mapped = map[event.which];
+
+  if (!modifiers) {
+    if (mapped !== undefined) {
+      event.preventDefault();
+      self.emit("move", mapped);
     }
+  }
 
-    // R key restarts the game
-    if (!modifiers && event.which === 82) {
-      self.restart.call(self, event);
-    }
-  });
-
+  if (!modifiers && event.which === 82) {
+    self.restart.call(self, event);
+  }
+});
   // Respond to button presses
   this.bindButtonPress(".retry-button", this.restart);
   this.bindButtonPress(".restart-button", this.restart);

@@ -77,11 +77,16 @@ GameManager.prototype.addRandomTile = function () {
 
 // Sends the updated grid to the actuator
 GameManager.prototype.actuate = function () {
-  if (this.storageManager.getBestScore() < this.score) {
-    this.storageManager.setBestScore(this.score);
+
+  // Lấy BestScore của tài khoản đang đăng nhập
+  var best = parseInt(document.getElementById("bestScore").innerText) || 0;
+
+  // Nếu điểm hiện tại lớn hơn thì cập nhật Best
+  if (this.score > best) {
+    best = this.score;
+    document.getElementById("bestScore").innerText = best;
   }
 
-  // Clear the state when the game is over (game over only, not win)
   if (this.over) {
     this.storageManager.clearGameState();
   } else {
@@ -89,10 +94,10 @@ GameManager.prototype.actuate = function () {
   }
 
   this.actuator.actuate(this.grid, {
-    score:      this.score,
-    over:       this.over,
-    won:        this.won,
-    bestScore:  this.storageManager.getBestScore(),
+    score: this.score,
+    over: this.over,
+    won: this.won,
+    bestScore: best,
     terminated: this.isGameTerminated()
   });
 
@@ -180,14 +185,69 @@ GameManager.prototype.move = function (direction) {
   });
 
   if (moved) {
-    this.addRandomTile();
 
-    if (!this.movesAvailable()) {
-      this.over = true; // Game over!
+  this.addRandomTile();
+
+  if (!this.movesAvailable()) {
+    this.over = true;
+  }
+
+  this.actuate();
+
+  // Lưu điểm lên SQL Server
+  if (window.currentUser) {
+
+    fetch("/save-score", {
+
+      method: "POST",
+
+      headers: {
+        "Content-Type": "application/json"
+      },
+
+      body: JSON.stringify({
+
+        username: window.currentUser,
+        score: this.score
+
+      })
+
+    })
+    .then(res => res.json())
+   .then(async data => {
+
+    console.log("Đã lưu điểm:", data);
+
+    // Cập nhật bảng xếp hạng
+    loadLeaderboard();
+
+    // Lấy lại thông tin người dùng từ SQL
+    const res = await fetch("/login", {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+            username: window.currentUser,
+            password: document.getElementById("password").value
+        })
+    });
+
+    const user = await res.json();
+
+    if (user.success) {
+        document.getElementById("bestScore").innerText =
+            user.user.HighScore;
     }
 
-    this.actuate();
+})
+    .catch(err => {
+      console.log(err);
+    });
+
   }
+
+}
 };
 
 // Get the vector representing the chosen direction

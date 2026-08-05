@@ -41,11 +41,11 @@ LocalStorageManager.prototype.localStorageSupported = function () {
 
 // Best score getters/setters
 LocalStorageManager.prototype.getBestScore = function () {
-  return this.storage.getItem(this.bestScoreKey) || 0;
+  return parseInt(document.getElementById("bestScore").innerText) || 0;
 };
 
 LocalStorageManager.prototype.setBestScore = function (score) {
-  this.storage.setItem(this.bestScoreKey, score);
+  document.getElementById("bestScore").innerText = score;
 };
 
 // Game state getters/setters and clearing

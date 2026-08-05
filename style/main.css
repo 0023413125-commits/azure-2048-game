@@ -8,7 +8,9 @@ html, body {
   font-size: 18px; }
 
 body {
-  margin: 80px 0; }
+  margin: 0;
+  padding: 0;
+  background: #faf8ef;}
 
 .heading:after {
   content: "";
@@ -756,3 +758,315 @@ hr {
     margin-top: 90px !important; }
   .game-message .lower {
     margin-top: 30px !important; } }
+/* ===========================
+   LOGIN
+=========================== */
+
+html,
+body{
+    margin:0;
+    padding:0;
+    width:100%;
+    min-height:100vh;
+    background:#faf8ef;
+    font-family:"Clear Sans","Helvetica Neue",Arial,sans-serif;
+}
+
+#loginContainer{
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    width:100%;
+    min-height:100vh;
+}
+
+.login-card{
+    width:420px;
+    background:#fff;
+    border-radius:15px;
+    padding:40px;
+    box-shadow:0 15px 40px rgba(0,0,0,.15);
+    text-align:center;
+}
+
+.login-card h1{
+    color:#776e65;
+    margin-bottom:10px;
+}
+
+.login-card p{
+    color:#888;
+    margin-bottom:25px;
+}
+
+.login-card input{
+    width:100%;
+    padding:14px;
+    margin-bottom:15px;
+    border:2px solid #bbada0;
+    border-radius:8px;
+    font-size:17px;
+    box-sizing:border-box;
+}
+
+.login-btn,
+.register-btn{
+    width:100%;
+    padding:14px;
+    border:none;
+    border-radius:8px;
+    cursor:pointer;
+    font-size:18px;
+    color:#fff;
+}
+
+.login-btn{
+    background:#edc22e;
+}
+
+.login-btn:hover{
+    background:#f2b179;
+}
+
+.register-btn{
+    margin-top:12px;
+    background:#8f7a66;
+}
+
+.register-btn:hover{
+    background:#776e65;
+}
+
+#msg{
+    margin-top:15px;
+    color:red;
+    font-weight:bold;
+}
+
+/* ===========================
+   LAYOUT
+=========================== */
+
+.main-layout{
+    max-width:1200px;
+    margin:40px auto;
+    display:flex;
+    gap:25px;
+    align-items:flex-start;
+}
+
+.left-panel{
+    width:300px;
+}
+
+.right-panel{
+    flex:1;
+    display:flex;
+    justify-content:center;
+}
+
+/* ===========================
+   USER BOX
+=========================== */
+
+.user-box{
+    background:#fff;
+    border-radius:20px;
+    padding:25px;
+    text-align:center;
+    box-shadow:0 10px 25px rgba(0,0,0,.12);
+}
+
+.user-box img{
+    width:90px;
+    height:90px;
+    border-radius:50%;
+    border:4px solid #edc22e;
+    margin-bottom:15px;
+}
+
+.user-box h2{
+    margin:10px 0;
+    color:#776e65;
+}
+
+.user-box p{
+    color:#999;
+    margin:8px 0;
+}
+
+.user-box h3{
+    color:#edc22e;
+    font-size:30px;
+    margin:10px 0;
+}
+
+.user-box button{
+    width:100%;
+    padding:12px;
+    margin-top:15px;
+    border:none;
+    border-radius:10px;
+    background:#8f7a66;
+    color:#fff;
+    cursor:pointer;
+    transition:.3s;
+}
+
+.user-box button:hover{
+    background:#776e65;
+}
+
+/* ===========================
+   LEADERBOARD
+=========================== */
+
+.leaderboard-box{
+    margin-top:25px;
+    background:#fff;
+    border-radius:20px;
+    padding:20px;
+    box-shadow:0 10px 25px rgba(0,0,0,.12);
+}
+
+.leaderboard-box h2{
+    margin-bottom:15px;
+    color:#776e65;
+}
+
+#leaderboard{
+    width:100%;
+    border-collapse:collapse;
+}
+
+#leaderboard th{
+    background:#bbada0;
+    color:#fff;
+}
+
+#leaderboard th,
+#leaderboard td{
+    padding:10px;
+    text-align:center;
+    border-bottom:1px solid #eee;
+}
+
+#leaderboard tbody tr:hover{
+    background:#faf8ef;
+}
+
+/* ===========================
+   GAME
+=========================== */
+
+.container{
+    margin:0;
+}
+
+.game-container{
+    box-shadow:0 12px 25px rgba(0,0,0,.15);
+    border-radius:10px;
+}
+
+/* ===========================
+   RESPONSIVE
+=========================== */
+
+@media (max-width:992px){
+
+    .main-layout{
+        flex-direction:column;
+        align-items:center;
+    }
+
+    .left-panel{
+        width:100%;
+        max-width:450px;
+    }
+
+    .right-panel{
+        width:100%;
+    }
+
+}
+
+@media (max-width:768px){
+
+    .main-layout{
+        padding:10px;
+        gap:20px;
+    }
+
+    .left-panel{
+        width:100%;
+    }
+
+    .user-box{
+        padding:20px;
+    }
+
+    .user-box img{
+        width:80px;
+        height:80px;
+    }
+
+    .user-box h2{
+        font-size:22px;
+    }
+
+    #leaderboard th,
+    #leaderboard td{
+        padding:8px;
+        font-size:14px;
+    }
+
+    .container{
+        transform:scale(.88);
+        transform-origin:top center;
+    }
+
+}
+
+@media (max-width:600px){
+
+    .login-card{
+        width:90%;
+        padding:25px;
+    }
+
+    .login-card h1{
+        font-size:30px;
+    }
+
+}
+
+@media (max-width:480px){
+
+    .container{
+        transform:scale(.75);
+        transform-origin:top center;
+    }
+
+    .user-box{
+        padding:15px;
+    }
+
+    #leaderboard{
+        font-size:13px;
+    }
+
+}
+.gold{
+    color:#FFD700;
+    font-size:22px;
+}
+
+.silver{
+    color:#C0C0C0;
+    font-size:22px;
+}
+
+.bronze{
+    color:#CD7F32;
+    font-size:22px;
+}
