@@ -2,6 +2,22 @@ require("dotenv").config();
 const express = require("express");
 const path = require("path");
 const sql = require("mssql");
+const { BlobServiceClient } = require("@azure/storage-blob");
+// =========================
+// Azure Blob Storage
+// =========================
+
+if (!process.env.AZURE_STORAGE_CONNECTION_STRING) {
+    console.error("❌ AZURE_STORAGE_CONNECTION_STRING chưa được cấu hình trong .env");
+    process.exit(1);
+}
+
+const blobServiceClient = BlobServiceClient.fromConnectionString(
+    process.env.AZURE_STORAGE_CONNECTION_STRING
+);
+
+const containerClient =
+    blobServiceClient.getContainerClient("game-data");
 
 const app = express();
 
@@ -129,52 +145,116 @@ app.post("/login", async (req, res) => {
     }
 
 });
-
-
-// =========================
-// Lưu điểm
-// =========================
 app.post("/save-score", async (req, res) => {
-
     const { username, score } = req.body;
 
+    // Kiểm tra dữ liệu
     if (!username) {
-        return res.json({
+        return res.status(400).json({
             success: false,
             message: "Chưa đăng nhập."
         });
     }
 
-    try {
+    const currentScore = Number(score);
 
-        await sql.query`
-            UPDATE Users
-            SET HighScore =
-            CASE
-                WHEN HighScore < ${score}
-                THEN ${score}
-                ELSE HighScore
-            END
+    if (!Number.isFinite(currentScore) || currentScore < 0) {
+        return res.status(400).json({
+            success: false,
+            message: "Điểm không hợp lệ."
+        });
+    }
+
+    try {
+        // =====================================
+        // 1. Kiểm tra user có tồn tại không
+        // =====================================
+        const userResult = await sql.query`
+            SELECT Username, ISNULL(HighScore, 0) AS HighScore
+            FROM Users
             WHERE Username = ${username}
         `;
 
-        res.json({
+        if (!userResult || !userResult.recordset || userResult.recordset.length === 0) {
+            return res.status(404).json({
+                success: false,
+                message: "Không tìm thấy tài khoản."
+            });
+        }
+
+        const oldHighScore = Number(userResult.recordset[0].HighScore) || 0;
+
+        // =====================================
+        // 2. Chỉ cập nhật nếu điểm mới cao hơn
+        // =====================================
+        let newHighScore = oldHighScore;
+
+        if (currentScore > oldHighScore) {
+            newHighScore = currentScore;
+
+            await sql.query`
+                UPDATE Users
+                SET HighScore = ${newHighScore}
+                WHERE Username = ${username}
+            `;
+
+            console.log(
+                `🏆 New HighScore: ${username} ${oldHighScore} -> ${newHighScore}`
+            );
+        } else {
+            console.log(
+                `ℹ️ Score không vượt HighScore: ${username} score=${currentScore}, highScore=${oldHighScore}`
+            );
+        }
+
+        // =====================================
+        // 3. Lưu lịch sử điểm vào Blob
+        // =====================================
+        const data = JSON.stringify({
+            username: username,
+            score: currentScore,
+            highScore: newHighScore,
+            savedAt: new Date().toISOString()
+        });
+
+        const blobName = `scores/${username}-${Date.now()}.json`;
+
+        const blockBlobClient =
+            containerClient.getBlockBlobClient(blobName);
+
+        await blockBlobClient.upload(
+            data,
+            Buffer.byteLength(data),
+            {
+                blobHTTPHeaders: {
+                    blobContentType: "application/json"
+                }
+            }
+        );
+
+        console.log(
+            `✅ Score saved: ${username} - ${currentScore} | HighScore: ${newHighScore}`
+        );
+
+        // =====================================
+        // 4. Trả HighScore về frontend
+        // =====================================
+        return res.json({
             success: true,
-            message: "Đã lưu điểm."
+            message: "Đã lưu điểm.",
+            score: currentScore,
+            highScore: newHighScore
         });
 
     } catch (err) {
+        console.error("❌ Save score error:", err);
 
-        res.json({
+        return res.status(500).json({
             success: false,
             message: err.message
         });
-
     }
-
 });
-
-
 // =========================
 // Leaderboard
 // =========================
@@ -202,4 +282,39 @@ const port = process.env.PORT || 8080;
 
 app.listen(port, () => {
     console.log(`Server running on port ${port}`);
+});
+app.get("/test-blob", async (req, res) => {
+    try {
+        const blobName = `test/test-${Date.now()}.txt`;
+
+        const blobClient =
+            containerClient.getBlockBlobClient(blobName);
+
+        const data = "Hello Azure Blob Storage!";
+
+        await blobClient.upload(
+            data,
+            Buffer.byteLength(data),
+            {
+                blobHTTPHeaders: {
+                    blobContentType: "text/plain"
+                }
+            }
+        );
+
+        res.json({
+            success: true,
+            message: "Blob hoạt động!",
+            blob: blobName
+        });
+
+    } catch (err) {
+
+        console.error("Blob test error:", err);
+
+        res.status(500).json({
+            success: false,
+            error: err.message
+        });
+    }
 });

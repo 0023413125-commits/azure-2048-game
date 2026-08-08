@@ -75,32 +75,32 @@ GameManager.prototype.addRandomTile = function () {
   }
 };
 
-// Sends the updated grid to the actuator
 GameManager.prototype.actuate = function () {
 
-  // Lấy BestScore của tài khoản đang đăng nhập
-  var best = parseInt(document.getElementById("bestScore").innerText) || 0;
-
-  // Nếu điểm hiện tại lớn hơn thì cập nhật Best
-  if (this.score > best) {
+    // Lấy HighScore đang có trên giao diện
+    // HighScore này phải là HighScore từ database
+    var best = parseInt(
+        document.getElementById("bestScore").innerText
+    ) || 0;
+if (this.score > best) {
     best = this.score;
     document.getElementById("bestScore").innerText = best;
-  }
+}
+    // Lưu trạng thái game
+    if (this.over) {
+        this.storageManager.clearGameState();
+    } else {
+        this.storageManager.setGameState(this.serialize());
+    }
 
-  if (this.over) {
-    this.storageManager.clearGameState();
-  } else {
-    this.storageManager.setGameState(this.serialize());
-  }
-
-  this.actuator.actuate(this.grid, {
-    score: this.score,
-    over: this.over,
-    won: this.won,
-    bestScore: best,
-    terminated: this.isGameTerminated()
-  });
-
+    // Cập nhật giao diện
+    this.actuator.actuate(this.grid, {
+        score: this.score,
+        over: this.over,
+        won: this.won,
+        bestScore: best,
+        terminated: this.isGameTerminated()
+    });
 };
 
 // Represent the current game as an object
@@ -186,70 +186,61 @@ GameManager.prototype.move = function (direction) {
 
   if (moved) {
 
-  this.addRandomTile();
+    // Thêm ô mới
+    this.addRandomTile();
 
-  if (!this.movesAvailable()) {
-    this.over = true;
-  }
-
-  this.actuate();
-
-  // Lưu điểm lên SQL Server
-  if (window.currentUser) {
-
-    fetch("/save-score", {
-
-      method: "POST",
-
-      headers: {
-        "Content-Type": "application/json"
-      },
-
-      body: JSON.stringify({
-
-        username: window.currentUser,
-        score: this.score
-
-      })
-
-    })
-    .then(res => res.json())
-   .then(async data => {
-
-    console.log("Đã lưu điểm:", data);
-
-    // Cập nhật bảng xếp hạng
-    loadLeaderboard();
-
-    // Lấy lại thông tin người dùng từ SQL
-    const res = await fetch("/login", {
-        method: "POST",
-        headers: {
-            "Content-Type": "application/json"
-        },
-        body: JSON.stringify({
-            username: window.currentUser,
-            password: document.getElementById("password").value
-        })
-    });
-
-    const user = await res.json();
-
-    if (user.success) {
-        document.getElementById("bestScore").innerText =
-            user.user.HighScore;
+    // Kiểm tra Game Over
+    if (!this.movesAvailable()) {
+        this.over = true;
     }
 
-})
-    .catch(err => {
-      console.log(err);
-    });
+    // Cập nhật SCORE và board
+    this.actuate();
 
-  }
+    // Chỉ lưu điểm khi GAME OVER
+    if (this.over && window.currentUser) {
 
+        fetch("/save-score", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({
+                username: window.currentUser,
+                score: this.score
+            })
+        })
+        .then(function (res) {
+            return res.json();
+        })
+        .then(function (data) {
+
+            console.log("Kết quả lưu điểm:", data);
+
+            if (!data.success) {
+                console.error(
+                    "Không lưu được điểm:",
+                    data.message
+                );
+                return;
+            }
+
+            // Lấy HighScore từ SQL
+            document.getElementById("bestScore").innerText =
+                Number(data.highScore) || 0;
+
+            // Load lại leaderboard
+            if (typeof loadLeaderboard === "function") {
+                loadLeaderboard();
+            }
+
+        })
+        .catch(function (err) {
+            console.error("Lỗi lưu điểm:", err);
+        });
+    }
 }
-};
-
+}
 // Get the vector representing the chosen direction
 GameManager.prototype.getVector = function (direction) {
   // Vectors representing tile movement
